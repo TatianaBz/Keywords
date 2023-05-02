@@ -47,7 +47,7 @@ const keyboard = [
   ["\'", 'э'],
   ['ENTER', 'ENTER'],
   ['Shift', 'Shift'],
-  ['EN', 'RU'],
+  ['en', 'ru'],
   ['z', 'я'],
   ['x', 'ч'],
   ['c', 'с'],
@@ -166,6 +166,7 @@ explanation.classList.add('explanation');
 /*ввод с витуальной клавиатуры */
 table.addEventListener('click', function (event) {
   let lett = event.target.innerHTML;
+  //console.log('event.key b',code);
   if (lett.length <= 1) {
     textarea.value = textarea.value + event.target.innerHTML;
   }
@@ -199,51 +200,24 @@ document.addEventListener('keydown', function (e) {
 /*Ввод символов с реальной клавиатуры*/
 document.addEventListener('keydown', function (event) {
   if (event.key.length <= 1) {
-    console.log(event.key);
+    event.preventDefault();
     let num = keys.indexOf(event.key);
     if (num >= 65) {
-      /* document.querySelectorAll('td').forEach(function (e) {
-         e.classList.remove('active');
-       });*/
-      if (flag !== true) {
-        flag = !flag;
-        saveLang(flag);
-      }
-      document.querySelector('td').innerHTML = keyboard[0][+flag];
-      k = cols[0] + 1;
-      document.querySelectorAll('tr td').forEach(function (e) {
-        e.innerHTML = keyboard[k][1];
-        k++;
-      });
-
       document.querySelector('[data-ru="' + event.key + '"]').classList.add('active');
-      let ru = event.key;
-      document.addEventListener('keyup', function () {
-        document.querySelector('[data-ru="' + ru + '"]').classList.remove('active');
-      });
+      num = num - 65;
+      console.log(event.key, num);
     } else {
-      /* document.querySelectorAll('td').forEach(function (e) {
-         e.classList.remove('active');
-       });*/
-
-      if (flag !== false)  {
-        flag = !flag;
-        saveLang(flag);
-      }
-      document.querySelector('td').innerHTML = keyboard[0][+flag];
-      k = cols[0] + 1;
-      document.querySelectorAll('tr td').forEach(function (e) {
-        k++;
-      });
       document.querySelector('[data-en="' + event.key + '"]').classList.add('active');
-      let en = event.key;
-      document.addEventListener('keyup', function () {
-        document.querySelector('[data-en="' + en + '"]').classList.remove('active');
-      });
     }
+    textarea.value = textarea.value + keyboard[num][+flag];
   }
-
+  document.addEventListener('keyup', function (event) {
+    document.querySelector('[data-ru="' + event.key + '"]').classList.remove('active');
+    document.querySelector('[data-en="' + event.key + '"]').classList.remove('active');
+  });
 });
+
+
 //  console.log(event.key);
 /*ЕNTER*/
 let enter = document.querySelector('[data-en="ENTER"]');
@@ -272,56 +246,130 @@ document.addEventListener('keydown', function (event) {
 });
 
 /*Shift*/
-let Shift = document.querySelector('[data-en="Shift"]');
-Shift.addEventListener('click', function () {
-  document.querySelector('[data-en="Shift"]').classList.add('active');
-  k = 0;
+let Shifts = document.querySelectorAll('[data-en="Shift"]');
+for (let Shift of Shifts){
+Shift.addEventListener('mousedown', function () {
+  document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
+    e.classList.add('active');
+  });
+  var k = 0;
   document.querySelectorAll('th td').forEach(function (e) {
-    e.innerHTML = keyboard[k][1];
+    if (e.innerHTML.length <= 1) {
+      e.innerHTML = keyboard[k][1];
+    }
+    k++;
+  });
+  if (flag == false) {
+    document.querySelector('td').innerHTML = '~';
+  } else
+    document.querySelector('td').innerHTML = 'Ё';
+  document.querySelectorAll('tr td').forEach(function (e) {
+    if (e.innerHTML.length <= 1) {
+      e.innerHTML = keyboard[k][+flag].toUpperCase();
+    }
+    k++;
+  });
+});
+Shift.addEventListener('mouseup', function () {
+  document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
+    e.classList.remove('active');
+  });
+  var k = 0;
+  document.querySelectorAll('th td').forEach(function (e) {
+    e.innerHTML = keyboard[k][0];
     k++;
   });
   document.querySelectorAll('tr td').forEach(function (e) {
-    e.innerHTML = keyboard[k][+flag].toUpperCase();
+    e.innerHTML = keyboard[k][+flag].toLowerCase();
     k++;
-  });
-
-
-  
-  Shift.addEventListener('click', function () {
-    document.querySelector('[data-en="Shift"]').classList.remove('active');
-    k = 0;
-    document.querySelectorAll('td').forEach(function (e) {
-      e.innerHTML = keyboard[k][+flag].toLowerCase();
-      k++;
-    });
   });
 });
 
+/**/
+
+document.addEventListener('keydown', function (event) {
+  console.log(event.code);
+  if (event.code == 'ShiftLeft' || event.code == 'ShiftRight') {
+    document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
+      e.classList.add('active');
+    });
+    var k = 0;
+    document.querySelectorAll('th td').forEach(function (e) {
+      if (e.innerHTML.length <= 1) {
+        e.innerHTML = keyboard[k][1];
+      }
+      k++;
+    });
+    if (flag == false) {
+      document.querySelector('td').innerHTML = '~';
+    } else
+      document.querySelector('td').innerHTML = 'Ё';
+    document.querySelectorAll('tr td').forEach(function (e) {
+      if (e.innerHTML.length <= 1) {
+        e.innerHTML = keyboard[k][+flag].toUpperCase();
+      }
+      k++;
+    });
+    event.preventDefault();
+  }
+
+  document.addEventListener('keyup', function (event) {
+    if (event.code == 'ShiftLeft' || event.code == 'ShiftRight') {
+      document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
+        e.classList.remove('active');
+      });
+      var k = 0;
+      document.querySelectorAll('th td').forEach(function (e) {
+        e.innerHTML = keyboard[k][0];
+        k++;
+      });
+      document.querySelectorAll('tr td').forEach(function (e) {
+        e.innerHTML = keyboard[k][+flag].toLowerCase();
+        k++;
+      });
+    }
+  });
+
+});
+}
 /*Caps Lock*/
+
 let caps = document.querySelector('[data-en="Caps Lock"]');
 caps.addEventListener('click', function () {
-  document.querySelector('[data-en="Caps Lock"]').classList.add('active');
-  k = 0;
-  document.querySelectorAll('td').forEach(function (e) {
-    e.innerHTML = keyboard[k][+flag].toUpperCase();
-    k++;
-  });
-
-  /* */
-  Shift.addEventListener('mousedown', function () {
-    document.querySelector('[data-en="Shift"]').classList.add('active');
-    k = 0;
-    document.querySelectorAll('td').forEach(function (e) {
-      e.innerHTML = keyboard[k][+flag].toLowerCase();
+  if ( document.querySelector('[data-en="Caps Lock"]').classList.contains('active')){
+    document.querySelector('[data-en="Caps Lock"]').classList.remove('active');
+    k = cols[1];
+    document.querySelectorAll('tr td').forEach(function (e) {
+      if (e.innerHTML.length <= 1) {
+        e.innerHTML = keyboard[k][+flag].toLowerCase();
+      }
       k++;
     });
-    Shift.addEventListener('mouseup', function () {
-      document.querySelector('[data-en="Shift"]').classList.remove('active');
-    });
-  });
 
-  /* */
-  caps.addEventListener('click', function () {
-    caps.querySelector('[data-en="Caps Lock"]').classList.remove('active');
+    /* */
+    for (let Shift of Shifts){
+      Shift.addEventListener('mousedown', function () {
+        document.querySelector('[data-en="Caps Lock"]').classList.add('active');
+        k = cols[1];
+        document.querySelectorAll('tr td').forEach(function (e) {
+          if (e.innerHTML.length <= 1) {
+            e.innerHTML = keyboard[k][+flag].toUpperCase();
+          }
+          k++;
+        });
+      });
+    }
+
+  } else {
+    document.querySelector('[data-en="Caps Lock"]').classList.add('active');
+  k = cols[1];
+  document.querySelectorAll('tr td').forEach(function (e) {
+    if (e.innerHTML.length <= 1) {
+      e.innerHTML = keyboard[k][+flag].toUpperCase();
+    }
+    k++;
   });
+  }
 });
+
+
