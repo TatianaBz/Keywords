@@ -190,7 +190,7 @@ document.addEventListener('keydown', function (e) {
     e.preventDefault();
   }
   document.addEventListener('keyup', function (e) {
-    if (e.altKey) {
+    if (e.altKey || e.ctrlKey) {
       document.querySelector('[data-en="Ctrl"]').classList.remove('active');
       document.querySelector('[data-en="Alt"]').classList.remove('active');
     }
@@ -202,19 +202,24 @@ document.addEventListener('keydown', function (event) {
   if (event.key.length <= 1) {
     event.preventDefault();
     let num = keys.indexOf(event.key);
+    console.log(event.key, num);
     if (num >= 65) {
       document.querySelector('[data-ru="' + event.key + '"]').classList.add('active');
       num = num - 65;
-      console.log(event.key, num);
+      document.addEventListener('keyup', function (event) {
+        document.querySelector('[data-ru="' + event.key + '"]').classList.remove('active');
+      });
     } else {
-      document.querySelector('[data-en="' + event.key + '"]').classList.add('active');
+      document.querySelector(`[data-en="${event.key}"]`).classList.add('active');
+      document.addEventListener('keyup', function (event) {
+        document.querySelector('[data-en="' + event.key + '"]').classList.remove('active');
+      });
     }
-    textarea.value = textarea.value + keyboard[num][+flag];
+    if (document.querySelector('[data-en="Caps Lock"]').classList.contains('active')) {
+      textarea.value = textarea.value + keyboard[num][+flag].toUpperCase();
+    } else
+      textarea.value = textarea.value + keyboard[num][+flag];
   }
-  document.addEventListener('keyup', function (event) {
-    document.querySelector('[data-ru="' + event.key + '"]').classList.remove('active');
-    document.querySelector('[data-en="' + event.key + '"]').classList.remove('active');
-  });
 });
 
 
@@ -244,52 +249,47 @@ document.addEventListener('keydown', function (event) {
     }
   });
 });
+/*DEL*/
+let del = document.querySelector('[data-en="DEL"]');
+del.addEventListener('click', function () {
+  textarea.value = ' ';
+});
+document.addEventListener('keydown', function (event) {
+  if (event.code == 'Delete') {
+    document.querySelector('[data-en="DEL"]').classList.add('active');
+    textarea.value = '  ';
+      event.preventDefault();
+  }
+});
+document.addEventListener('keyup', function (event) {
+  if (event.code == 'Delete') {
+    document.querySelector('[data-en="DEL"]').classList.remove('active');
+     }
+});
+
+/*Backspase*/
+let back= document.querySelector('[data-en="Backspase"]');
+back.addEventListener('click', function () {
+  textarea.value.pop();
+});
+document.addEventListener('keydown', function (event) {
+  if (event.code == 'Backspase') {
+    document.querySelector('[data-en="Backspase"]').classList.add('active');
+    textarea.value.pop();
+      event.preventDefault();
+  }
+});
+document.addEventListener('keyup', function (event) {
+  if (event.code == 'Backspase') {
+    document.querySelector('[data-en="Backspase"]').classList.remove('active');
+     }
+});
+
 
 /*Shift*/
 let Shifts = document.querySelectorAll('[data-en="Shift"]');
-for (let Shift of Shifts){
-Shift.addEventListener('mousedown', function () {
-  document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
-    e.classList.add('active');
-  });
-  var k = 0;
-  document.querySelectorAll('th td').forEach(function (e) {
-    if (e.innerHTML.length <= 1) {
-      e.innerHTML = keyboard[k][1];
-    }
-    k++;
-  });
-  if (flag == false) {
-    document.querySelector('td').innerHTML = '~';
-  } else
-    document.querySelector('td').innerHTML = 'Ё';
-  document.querySelectorAll('tr td').forEach(function (e) {
-    if (e.innerHTML.length <= 1) {
-      e.innerHTML = keyboard[k][+flag].toUpperCase();
-    }
-    k++;
-  });
-});
-Shift.addEventListener('mouseup', function () {
-  document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
-    e.classList.remove('active');
-  });
-  var k = 0;
-  document.querySelectorAll('th td').forEach(function (e) {
-    e.innerHTML = keyboard[k][0];
-    k++;
-  });
-  document.querySelectorAll('tr td').forEach(function (e) {
-    e.innerHTML = keyboard[k][+flag].toLowerCase();
-    k++;
-  });
-});
-
-/**/
-
-document.addEventListener('keydown', function (event) {
-  console.log(event.code);
-  if (event.code == 'ShiftLeft' || event.code == 'ShiftRight') {
+for (let Shift of Shifts) {
+  Shift.addEventListener('mousedown', function () {
     document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
       e.classList.add('active');
     });
@@ -310,48 +310,154 @@ document.addEventListener('keydown', function (event) {
       }
       k++;
     });
-    event.preventDefault();
-  }
+  });
+  Shift.addEventListener('mouseup', function () {
+    document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
+      e.classList.remove('active');
+    });
+    var k = 0;
+    document.querySelectorAll('th td').forEach(function (e) {
+      e.innerHTML = keyboard[k][0];
+      k++;
+    });
+    document.querySelectorAll('tr td').forEach(function (e) {
+      e.innerHTML = keyboard[k][+flag].toLowerCase();
+      k++;
+    });
+  });
 
-  document.addEventListener('keyup', function (event) {
+  /**/
+
+  document.addEventListener('keydown', function (event) {
+    console.log(event.code);
     if (event.code == 'ShiftLeft' || event.code == 'ShiftRight') {
       document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
-        e.classList.remove('active');
+        e.classList.add('active');
       });
       var k = 0;
       document.querySelectorAll('th td').forEach(function (e) {
-        e.innerHTML = keyboard[k][0];
+        if (e.innerHTML.length <= 1) {
+          e.innerHTML = keyboard[k][1];
+        }
         k++;
       });
+      if (flag == false) {
+        document.querySelector('td').innerHTML = '~';
+      } else
+        document.querySelector('td').innerHTML = 'Ё';
       document.querySelectorAll('tr td').forEach(function (e) {
-        e.innerHTML = keyboard[k][+flag].toLowerCase();
+        if (e.innerHTML.length <= 1) {
+          e.innerHTML = keyboard[k][+flag].toUpperCase();
+        }
         k++;
       });
+      event.preventDefault();
     }
-  });
 
-});
+    document.addEventListener('keyup', function (event) {
+      if (event.code == 'ShiftLeft' || event.code == 'ShiftRight') {
+        document.querySelectorAll('[data-en="Shift"]').forEach(function (e) {
+          e.classList.remove('active');
+        });
+        var k = 0;
+        document.querySelectorAll('th td').forEach(function (e) {
+          e.innerHTML = keyboard[k][0];
+          k++;
+        });
+        document.querySelectorAll('tr td').forEach(function (e) {
+          e.innerHTML = keyboard[k][+flag].toLowerCase();
+          k++;
+        });
+      }
+    });
+  });
 }
 /*Caps Lock*/
 
 let caps = document.querySelector('[data-en="Caps Lock"]');
 caps.addEventListener('click', function () {
-  if ( document.querySelector('[data-en="Caps Lock"]').classList.contains('active')){
+
+  if (document.querySelector('[data-en="Caps Lock"]').classList.contains('active')) {
     document.querySelector('[data-en="Caps Lock"]').classList.remove('active');
     k = cols[1];
     document.querySelectorAll('tr td').forEach(function (e) {
+      if (flag == false) {
+        document.querySelector('td').innerHTML = '~';
+      } else
+        document.querySelector('td').innerHTML = 'ё';
       if (e.innerHTML.length <= 1) {
         e.innerHTML = keyboard[k][+flag].toLowerCase();
       }
       k++;
     });
 
+  } else {
+    document.querySelector('[data-en="Caps Lock"]').classList.add('active');
+    k = cols[1];
+
+    document.querySelectorAll('tr td').forEach(function (e) {
+      if (flag == false) {
+        document.querySelector('td').innerHTML = '~';
+      } else
+        document.querySelector('td').innerHTML = 'Ё';
+      if (e.innerHTML.length <= 1) {
+        e.innerHTML = keyboard[k][+flag].toUpperCase();
+      }
+      k++;
+    });
+
     /* */
-    for (let Shift of Shifts){
+    for (let Shift of Shifts) {
       Shift.addEventListener('mousedown', function () {
-        document.querySelector('[data-en="Caps Lock"]').classList.add('active');
+        document.querySelector('[data-en="Shift"]').classList.add('active');
         k = cols[1];
         document.querySelectorAll('tr td').forEach(function (e) {
+          if (flag == false) {
+            document.querySelector('td').innerHTML = '~';
+          } else
+            document.querySelector('td').innerHTML = 'Ё';
+          if (('[data-ru="' + e + '"]').length <= 1) {
+            e.innerHTML = keyboard[k][+flag].toLowerCase();
+          }
+          k++;
+        });
+      });
+      Shift.addEventListener('mouseup', function () {
+        document.querySelector('[data-en="Shift"]').classList.remove('active');
+        k = cols[1];
+        document.querySelectorAll('tr td').forEach(function (e) {
+          if (flag == false) {
+            document.querySelector('td').innerHTML = '~';
+          } else
+            document.querySelector('td').innerHTML = 'ё';
+          if (('[data-ru="' + e + '"]').length <= 1) {
+            e.innerHTML = keyboard[k][+flag].toUpperCase();
+          }
+          k++;
+        });
+      });
+      Shift.addEventListener('keydown', function () {
+        document.querySelector('[data-en="Shift"]').classList.add('active');
+        k = cols[1];
+        document.querySelectorAll('tr td').forEach(function (e) {
+          if (flag == false) {
+            document.querySelector('td').innerHTML = '~';
+          } else
+            document.querySelector('td').innerHTML = 'Ё';
+          if (e.innerHTML.length <= 1) {
+            e.innerHTML = keyboard[k][+flag].toLowerCase();
+          }
+          k++;
+        });
+      });
+      Shift.addEventListener('keyup', function () {
+        document.querySelector('[data-en="Shift"]').classList.remove('active');
+        k = cols[1];
+        document.querySelectorAll('tr td').forEach(function (e) {
+          if (flag == false) {
+            document.querySelector('td').innerHTML = '~';
+          } else
+            document.querySelector('td').innerHTML = 'ё';
           if (e.innerHTML.length <= 1) {
             e.innerHTML = keyboard[k][+flag].toUpperCase();
           }
@@ -359,17 +465,21 @@ caps.addEventListener('click', function () {
         });
       });
     }
-
-  } else {
-    document.querySelector('[data-en="Caps Lock"]').classList.add('active');
-  k = cols[1];
-  document.querySelectorAll('tr td').forEach(function (e) {
-    if (e.innerHTML.length <= 1) {
-      e.innerHTML = keyboard[k][+flag].toUpperCase();
-    }
-    k++;
-  });
   }
 });
+/* */
 
-
+document.addEventListener('keydown', function (event) {
+  if (event.code == 'CapsLock') {
+        document.querySelectorAll('[data-en="Caps Lock"]').forEach(function (e) {
+        e.classList.add('active');
+      });
+    }
+});
+document.addEventListener('keyup', function (event) {
+  if (event.code == 'CapsLock') {
+        document.querySelectorAll('[data-en="Caps Lock"]').forEach(function (e) {
+        e.classList.remove('active');
+      });
+    }
+});
