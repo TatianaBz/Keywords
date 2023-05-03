@@ -1,6 +1,7 @@
 let flag = false;
 let carrentLeng;
 window.addEventListener('load', carrentLeng);
+
 saveLang(flag);
 
 const keyboard = [
@@ -270,12 +271,12 @@ document.addEventListener('keyup', function (event) {
 /*Backspase*/
 let back= document.querySelector('[data-en="Backspase"]');
 back.addEventListener('click', function () {
-  textarea.value.pop();
+  textarea.value=textarea.value.slice(0,-1);
 });
 document.addEventListener('keydown', function (event) {
   if (event.code == 'Backspase') {
     document.querySelector('[data-en="Backspase"]').classList.add('active');
-    textarea.value.pop();
+    textarea.value=textarea.value.slice(0,-1);
       event.preventDefault();
   }
 });
