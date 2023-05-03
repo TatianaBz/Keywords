@@ -1,6 +1,6 @@
-let flag = false;
+
 let carrentLeng;
-saveLang(flag);
+
 window.addEventListener('load', carrentLeng);
 
 
@@ -87,6 +87,9 @@ let body = document.querySelector('body');
 let wrapper = document.createElement('div');
 let textarea = document.createElement('textarea');
 
+let flag = false;
+saveLang(flag);
+
 /*Сохранение раскладки языка через localStorage*/
 let lang = [];
 
@@ -107,12 +110,10 @@ carrentLeng = function getLang() {
   if (localStorage.getItem('langs')) {
     langs = JSON.parse(localStorage.getItem('langs'));
     j = langs[langs.length - 1];
-    setTimeout(() => {
-
-    }, 1000);
      return j;
 
   }
+
 };
 
 /*добавлена клавиатура*/
@@ -203,17 +204,21 @@ document.addEventListener('keydown', function (event) {
   if (event.key.length <= 1) {
     event.preventDefault();
     let num = keys.indexOf(event.key);
-    console.log(event.key, num);
+  console.log(event.key);
     if (num >= 65) {
-      document.querySelector('[data-ru="' + event.key + '"]').classList.add('active');
+      document.querySelector(`[data-ru="${event.key.toLowerCase()}"]`).classList.add('active');
       num = num - 65;
-      document.addEventListener('keyup', function (event) {
-        document.querySelector('[data-ru="' + event.key + '"]').classList.remove('active');
+      document.addEventListener('keyup', function () {
+        document.querySelectorAll('td').forEach(function(e){
+          e.classList.remove('active');
+        });
       });
     } else {
-      document.querySelector(`[data-en="${event.key}"]`).classList.add('active');
-      document.addEventListener('keyup', function (event) {
-        document.querySelector('[data-en="' + event.key + '"]').classList.remove('active');
+      document.querySelector(`[data-en="${event.key.toLowerCase()}"]`).classList.add('active');
+      document.addEventListener('keyup', function () {
+        document.querySelectorAll('td').forEach(function(e){
+          e.classList.remove('active');
+        });
       });
     }
     if (document.querySelector('[data-en="Caps Lock"]').classList.contains('active')) {
@@ -250,6 +255,7 @@ document.addEventListener('keydown', function (event) {
     }
   });
 });
+
 /*DEL*/
 let del = document.querySelector('[data-en="DEL"]');
 del.addEventListener('click', function () {
@@ -283,6 +289,66 @@ document.addEventListener('keydown', function (event) {
 document.addEventListener('keyup', function (event) {
   if (event.code == 'Backspase') {
     document.querySelector('[data-en="Backspase"]').classList.remove('active');
+  }
+});
+
+/* СТРЕЛКИ*/
+document.addEventListener('keydown', function (event) {
+  console.log(event.code);
+  if (event.code == 'ArrowUp') {
+    textarea.value = textarea.value +  document.querySelector('[data-en="&#11165;"]').innerHTML;
+    document.querySelector('[data-en="&#11165;"]').classList.add('active');
+    event.preventDefault();
+  }
+  if (event.code == 'ArrowLeft') {
+    textarea.value = textarea.value +  document.querySelector('[data-en="&#11164;"]').innerHTML;
+    document.querySelector('[data-en="&#11164;"]').classList.add('active');
+    event.preventDefault();
+  }
+  if (event.code == 'ArrowDoun') {
+    textarea.value = textarea.value +  document.querySelector('[data-en="&#11167;"]').innerHTML;
+    document.querySelector('[data-en="&#11167;"]').classList.add('active');
+    event.preventDefault();
+  }
+  if (event.code == 'ArrowRigt') {
+    textarea.value = textarea.value +  document.querySelector('[data-en="&#11166;"]').innerHTML;
+    document.querySelector('[data-en="&#11166;"]').classList.add('active');
+    event.preventDefault();
+  }
+});
+
+  document.addEventListener('keyup', function (event) {
+    if (event.code == 'ArrowUp') {
+      document.querySelector('[data-en="&#11165;"]').classList.remove('active');
+    }
+
+  if (event.code == 'ArrowDoun') {
+    document.querySelector('[data-en="&#11167;"]').classList.remove('active');
+  }
+
+  if (event.code == 'ArrowRight') {
+    document.querySelector('[data-en="&#11166;"]').classList.remove('active');
+  }
+
+if (event.code == 'ArrowLeft') {
+  document.querySelector('[data-en="&#11164;"]').classList.remove('active');
+}
+});
+
+/*Alt*/
+document.addEventListener('keydown', function (event) {
+  if (event.code == 'AltRight' || event.code == 'AltLeft') {
+    document.querySelectorAll('[data-en="Alt"]').forEach(function (e) {
+      e.classList.add('active');
+    });
+  }
+  });
+
+document.addEventListener('keyup', function (event) {
+  if (event.code == 'AltRight' || event.code == 'AltLeft') {
+    document.querySelectorAll('[data-en="Alt"]').forEach(function (e) {
+      e.classList.remove('active');
+    });
   }
 });
 
@@ -485,7 +551,8 @@ caps.addEventListener('click', function () {
 });
 
 /*Нажатие клавиши Caps Lock на реальной клавиатуре */
-document.addEventListener('keydown', function () {
+document.addEventListener('keydown', function (event) {
+  if (event.code == 'CapsLock') {
   if (document.querySelector('[data-en="Caps Lock"]').classList.contains('active')) {
     document.querySelector('[data-en="Caps Lock"]').classList.remove('active');
     k = cols[1];
@@ -570,5 +637,5 @@ document.addEventListener('keydown', function () {
         });
       });
     }
-  }
+  }}
 });
